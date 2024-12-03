@@ -1,5 +1,4 @@
 """eWaterCycle wrapper for the STEMMUS_SCOPE model."""
-from collections.abc import ItemsView
 from pathlib import Path
 from typing import Any
 
@@ -7,30 +6,66 @@ from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel
 from ewatercycle.container import ContainerImage
 from ewatercycle.base.parameter_set import ParameterSet
 
+PARAMETERSET_CFG_PATHS = (
+    "directional",
+    "fluspect_parameters",
+    "leafangles",
+    "radiationdata",
+    "soil_spectrum",
+    "input_data",
+)
+
+
+def read_config(config_file: str | Path) -> dict[str, str]:
+    config = {}
+    with Path(config_file).open(encoding="utf8") as f:
+        for line in f:
+            (key, val) = line.split("=")
+            config[key] = val.rstrip("\n")
+    return config
+
+
+def write_config(fname: Path, config: dict[str, Any]) -> None:
+    with fname.open(mode="w", encoding="utf8") as f:
+        for key, value in config.items():
+            f.write(f"{key}={value}\n")
+
+
 class StemmusScopeMethods(eWaterCycleModel):
-    """The eWatercycle STEMMUS_SCOPE model.
-    """
+    """The eWatercycle STEMMUS_SCOPE model."""
     forcing: None  # The model has no eWaterCycle forcing class.
     parameter_set: ParameterSet  # The model requires a parameter set (incl. forcing)
 
-    _config: dict = {}
-
     def _make_cfg_file(self, **kwargs) -> Path:
         """Write model configuration file."""
+        config = read_config(self.parameter_set.directory / self.parameter_set.config)
 
         for kwarg in kwargs:  # Write any kwargs to the config.
-            self._config[kwarg] = kwargs[kwarg]
+            config[kwarg] = kwargs[kwarg]
 
-        config_file = self._cfg_dir / "config.txt"
+        config["InputPath"] = str(self.parameter_set.directory) + "/"
+        config["InitialConditionsPath"] = str(self._cfg_dir) + "/" # not used
+        if "Location" not in config:
+            config["Location"] = "Any"
 
-        with config_file.open(mode="w") as f:
-            f.write("")
+        for _dir in PARAMETERSET_CFG_PATHS:
+            absolute_path = self.parameter_set.directory / config[_dir]
+            if absolute_path.is_dir():  # directories need to end in / for matlab code.
+                ext =  "/"
+            else:
+                ext = ""
+            config[_dir] = str(absolute_path) + ext
 
-        return config_file
+        # Prep working directory, output path
+        for _dir in ("WorkDir", "OutputPath"):
+            _path = self._cfg_dir / _dir
+            _path.mkdir()
+            config[_dir] = str(_path) + "/"
 
-    @property
-    def parameters(self) -> ItemsView[str, Any]:
-        return self._config.items()
+        output_cfg_file = self._cfg_dir / "STEMMUS_SCOPE_config.txt"
+        write_config(output_cfg_file, config)
+
+        return output_cfg_file
 
 
 class StemmusScope(ContainerizedModel, StemmusScopeMethods):
