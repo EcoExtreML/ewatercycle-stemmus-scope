@@ -1,29 +1,23 @@
-# eWaterCycle plugin example: a leaky bucket model
+# eWaterCycle plugin for STEMMUS_SCOPE
 
-This repository is a template for adding models to eWatercycle, and will guide you through all required steps.
+STEMMUS_SCOPE plugin for [eWatercycle](https://ewatercycle.readthedocs.io/).
 
-As an example this plugin adds the ["leakybucket" model](https://github.com/eWaterCycle/leakybucket-bmi). 
-
-To use the template, press the green "Use this template" button on GitHub, and replace all instances of "leakybucket"/"LeakyBucket" with your model name.
+The STEMMUS_SCOPE documentation is available at https://ecoextreml.github.io/STEMMUS_SCOPE/
 
 ## Installation
 
 Install this package alongside your eWaterCycle installation
 
 ```console
-pip install ewatercycle-leakybucket
+pip install ewatercycle-stemmus-scope
 ```
 
-Then LeakyBucket becomes available as one of the eWaterCycle models
+Then STEMMUS_SCOPE becomes available as one of the eWaterCycle models
 
 ```python
-from ewatercycle.models import LeakyBucket
+from ewatercycle.models import StemmusScope
 ```
-
-## Implementing your own model
-
-For more information on how this plugin works, and on how to implement your own model see the [plugin guide](plugin_guide.md)
 
 ## License
 
-`ewatercycle-plugin` is distributed under the terms of the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license.
+`ewatercycle-stemmus-scope` is distributed under the terms of the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license.
