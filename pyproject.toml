@@ -3,17 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "src/ewatercycle_leakybucket/__init__.py"
+path = "src/ewatercycle_stemmus_scope/__init__.py"
 
 [project]
-name = "ewatercycle-leakybucket"
-description = "Template project for starting a new eWaterCycle plugin"
+name = "ewatercycle-stemmus-scope"
+description = "eWaterCycle plugin for the STEMMUS_SCOPE model"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
-  { name = "Bart Schilperoort, Peter Kalverla, Stefan Verhoeven", email = "b.schilperoort@esciencecenter.nl" },
+  { name = "Bart Schilperoort", email = "b.schilperoort@esciencecenter.nl" },
 ]
-keywords = ["ewatercycle", "hydrology"]
+keywords = ["ewatercycle", "stemmus_scope"]
 classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",
@@ -31,4 +31,4 @@ dynamic = ["version"]
 
 # This registers the plugin such that it is discoverable by eWaterCycle
 [project.entry-points."ewatercycle.models"]
-LeakyBucket = "ewatercycle_leakybucket.model:LeakyBucket"
+StemmusScope = "ewatercycle_stemmus_scope.model:StemmusScope"
