@@ -6,15 +6,6 @@ from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel
 from ewatercycle.container import ContainerImage
 from ewatercycle.base.parameter_set import ParameterSet
 
-PARAMETERSET_CFG_PATHS = (
-    "directional",
-    "fluspect_parameters",
-    "leafangles",
-    "radiationdata",
-    "soil_spectrum",
-    "input_data",
-)
-
 
 def read_config(config_file: str | Path) -> dict[str, str]:
     config = {}
@@ -43,18 +34,16 @@ class StemmusScopeMethods(eWaterCycleModel):
         for kwarg in kwargs:  # Write any kwargs to the config.
             config[kwarg] = kwargs[kwarg]
 
-        config["InputPath"] = str(self.parameter_set.directory) + "/"
-        config["InitialConditionsPath"] = str(self._cfg_dir) + "/" # not used
-        if "Location" not in config:
-            config["Location"] = "Any"
-
-        for _dir in PARAMETERSET_CFG_PATHS:
-            absolute_path = self.parameter_set.directory / config[_dir]
-            if absolute_path.is_dir():  # directories need to end in / for matlab code.
-                ext =  "/"
-            else:
-                ext = ""
-            config[_dir] = str(absolute_path) + ext
+        input_path = Path(config["InputPath"])
+        if input_path.is_absolute() and not input_path.is_relative_to(self.parameter_set.config):
+            msg = "Invalid parameterset: `InputPath` data is not relative to the config file!"
+            raise ValueError(msg)
+        if not input_path.is_absolute():
+            input_path = self.parameter_set.directory / input_path
+        if not input_path.exists():
+            msg = f"No directory founds at {input_path}"
+            raise ValueError(msg)
+        config["InputPath"] = str(input_path) + "/"  # directories need to end in / for matlab code.
 
         # Prep working directory, output path
         for _dir in ("WorkDir", "OutputPath"):
